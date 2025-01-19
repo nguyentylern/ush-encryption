@@ -151,7 +151,7 @@ section + section {
 .block-input {
     display: grid;
     grid-template-columns: auto 1fr;
-    align-items: center;
+    align-items: stretch;
 }
 
 .block-input label {
@@ -166,7 +166,7 @@ section + section {
     border: 1px solid #000000;
     border-left: 0;
     border-radius: 0 0.5rem 0.5rem 0;
-    height: calc(2rem + 2px);
+    min-width: calc(50vw - 1.75rem);
 }
 
 footer {
