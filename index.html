@@ -91,7 +91,7 @@
                 return;
             }
             if (message.length % 16 != 0) {
-                var missing = 16 - message.length;
+                var missing = 16 * (Math.floor(message.length / 16) + 1) - message.length;
                 var missing_string = ' '.repeat(missing);
                 message = message + missing_string;
             }
