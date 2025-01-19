@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Encryption</title>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.js"></script> -->
+    <script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Encryption</h1>
+        <p>Encryption is the transformation of information, generally used to prevent unauthorized access to that information. Encryption has been used to communicate messages secretly and has been influential in wartime intelligence.</p>
+    </header>
+    <main>
+        <section>
+            <h2>World War I → Playfair Cipher</h2>
+            <p>The Playfair cipher was a cipher first invented by Charles Wheatstone in 1854, but it was used by the British during World War I. The cipher involves a key phrase that is then input into a five by five matrix alongside other letters of the alphabet. From this matrix, the encoding is performed. GeeksforGeeks has <a href="https://www.geeksforgeeks.org/playfair-cipher-with-examples/">a good explanation as to how a message is encrypted with the Playfair cipher</a>. An implementation is provided below.</p>
+            <p>Implementation in progress.</p>
+            <div class="block">
+                <h3>Encrypt</h3>
+                <div class="block-input">
+                    <label for="message_pf">Message</label>
+                    <input type="text" name="message_pf" id="message_pf" placeholder="Message">
+                </div>
+                <div class="block-input">
+                    <label for="key1_pf">Key</label>
+                    <input type="text" name="key1_pf" id="key1_pf" placeholder="Key Phrase">
+                </div>
+                <button onclick="encrypt_message_pf()">Encrypt</button>
+                <div class="block-output">
+                    <div id="encrypted_pf">No Message</div>
+                </div>
+            </div>
+            <div class="block">
+                <h3>Decrypt</h3>
+                <div class="block-input">
+                    <label for="encrypted_d_pf">Encrypted Message</label>
+                    <input type="text" name="encrypted_d_pf" id="encrypted_d_pf" placeholder="Encrypted Message">
+                </div>
+                <div class="block-input">
+                    <label for="key2_pf">Key</label>
+                    <input type="text" name="key2_pf" id="key2_pf" placeholder="Key Phrase">
+                </div>
+                <button onclick="decrypt_message_pf()">Decrypt</button>
+                <div class="block-output">
+                    <div id="decrypted_pf">No Message</div>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>Innovation → Advanced Encryption Standard (AES)</h2>
+            <p>The Advanced Encryption Standard (AES) is a standardized method of encryption created by the U.S. National Institute of Standards and Technology in 2001. This method of encryption is far more advanced than the Playfair cipher and relies on the computational power of modern computers to encrypt messages. It is a symmetric-key algorithm; this means that the same key is used to encrypt and decrypt some data. An example is provided below, but a predetermined key has been provided.</p>
+            <div class="block">
+                <h3>Encrypt</h3>
+                <div class="block-input">
+                    <label for="message_aes">Message</label>
+                    <input type="text" name="message_aes" id="message_aes" placeholder="Message">
+                </div>
+                <button onclick="encrypt_message_aes()">Encrypt</button>
+                <div class="block-output">
+                    <div id="encrypted_aes">No Message</div>
+                </div>
+            </div>
+            <div class="block">
+                <h3>Decrypt</h3>
+                <div class="block-input">
+                    <label for="encrypted_d_aes">Encrypted Message</label>
+                    <input type="text" name="encrypted_d_aes" id="encrypted_d_aes" placeholder="Encrypted Message">
+                </div>
+                <button onclick="decrypt_message_aes()">Decrypt</button>
+                <div class="block-output">
+                    <div id="decrypted_aes">No Message</div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>Created by Tyler Nguyen and Hannah Lu.</p>
+    </footer>
+    <script>
+        const key = [ 44, 11, 9, 93, 129, 46, 79, 83, 81, 90, 51, 2, 7, 19, 72, 36 ];
+        const iv = [ 12, 24, 1, 15, 32, 49, 37, 98, 201, 155, 41, 4, 87, 74, 64, 18 ];
+        function encrypt_message_aes() {
+            var message = document.getElementById('message_aes').value;
+            if (!message) {
+                alert('Please provide a message.');
+                return;
+            }
+            if (message.length % 16 != 0) {
+                var missing = 16 - message.length;
+                var missing_string = ' '.repeat(missing);
+                message = message + missing_string;
+            }
+            var message_bytes = aesjs.utils.utf8.toBytes(message);
+
+            var aes_cbc = new aesjs.ModeOfOperation.cbc(key, iv);
+            var encrypted_bytes = aes_cbc.encrypt(message_bytes);
+            var encrypted_hex = aesjs.utils.hex.fromBytes(encrypted_bytes);
+            document.getElementById('encrypted_aes').textContent = encrypted_hex;
+            console.log(encrypted_hex);
+        }
+        function decrypt_message_aes() {
+            var encrypted_message = document.getElementById('encrypted_d_aes').value;
+            if (!encrypted_message) {
+                alert('Please provide an encrypted message.');
+                return;
+            }
+            var encrypted_message_bytes = aesjs.utils.hex.toBytes(encrypted_message);
+
+            var aes_cbc = new aesjs.ModeOfOperation.cbc(key, iv);
+            var decrypted_bytes = aes_cbc.decrypt(encrypted_message_bytes);
+            var decrypted_hex = aesjs.utils.utf8.fromBytes(decrypted_bytes);
+            document.getElementById('decrypted_aes').textContent = decrypted_hex;
+            console.log(decrypted_hex);
+        }
+        function encrypt_message_pf() {
+            var message = document.getElementById('message_pf').value;
+            var key = document.getElementById('key1_pf').value;
+            if (!message || !key) {
+                alert('Please enter both a message and key.');
+                return;
+            }
+            console.log('to be implemented');
+        }
+        function decrypt_message_pf() {
+            var encrypted_message = document.getElementById('encrypted_d_pf').value;
+            var key = document.getElementById('key2_pf').value;
+            if (!encrypted_message || !key) {
+                alert('Please enter both a message and key.');
+                return;
+            }
+            console.log('to be implemented');
+        }
+    </script>
+</body>
+</html>

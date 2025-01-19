@@ -1,0 +1,175 @@
+:root {
+    font-family: Inter, sans-serif;
+    font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+}
+@supports (font-variation-settings: normal) {
+    :root { font-family: InterVariable, sans-serif; }
+}
+
+/* reset */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    text-decoration: inherit;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+body {
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}
+
+img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+}
+
+svg {
+    height: auto;
+    width: 100%;
+}
+
+input, button, textarea, select {
+    font: inherit;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+}
+
+/* sr_only */
+
+.visually-hidden:not(:focus):not(:active) {
+    clip: rect(0 0 0 0); 
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap; 
+    width: 1px;
+}
+
+/* styles */
+
+body {
+    width: min(80ch, 100% - 2rem);
+    margin-inline: auto;
+    margin-block: 1rem;
+}
+
+a {
+    color: #000000;
+    text-decoration: underline;
+}
+
+a:hover {
+    text-decoration-style: dotted;
+}
+
+header h1 {
+    font-size: 4rem;
+    font-weight: bold;
+    line-height: 1.25;
+}
+
+header p {
+    margin-top: 1rem;
+}
+
+main {
+    margin-top: 1rem;
+}
+
+section h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1.25;
+}
+
+section > * + * {
+    margin-top: 1rem;
+}
+
+header p, section > p {
+    line-height: 1.5;
+    text-align: justify;
+}
+
+section + section {
+    margin-top: 1rem;
+}
+
+/* block */
+
+.block {
+    padding: 0.75rem;
+    border: 1px solid #000000;
+    border-radius: 1rem;
+}
+
+.block h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.block > * + * {
+    margin-top: 0.75rem;
+}
+
+.block-output {
+    padding: 0.5rem;
+    border: 1px solid #000000;
+    border-radius: 0.5rem;
+}
+
+.block button {
+    color: #ffffff;
+    background-color: #000000;
+    border: 1px solid #000000;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.block button:hover {
+    /* color: #000000;
+    background-color: #ffffff; */
+    font-weight: bold;
+}
+
+.block-input {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+}
+
+.block-input label {
+    border: 1px solid #000000;
+    border-radius: 0.5rem 0 0 0.5rem;
+    padding: 0.5rem;
+}
+
+.block-input input[type="text" i] {
+    padding-block: 0.5rem;
+    padding-inline: 0.5rem;
+    border: 1px solid #000000;
+    border-left: 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+    height: calc(2rem + 2px);
+}
+
+footer {
+    margin-block: 2rem;
+    text-align: center;
+}
