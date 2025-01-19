@@ -18,8 +18,8 @@
     <main>
         <section>
             <h2>World War I → Playfair Cipher</h2>
-            <p>The Playfair cipher was a cipher first invented by Charles Wheatstone in 1854, but it was used by the British during World War I. The cipher involves a key phrase that is then input into a five by five matrix alongside other letters of the alphabet. From this matrix, the encoding is performed. GeeksforGeeks has <a href="https://www.geeksforgeeks.org/playfair-cipher-with-examples/">a good explanation as to how a message is encrypted with the Playfair cipher</a>. An implementation is provided below.</p>
-            <p>Implementation in progress.</p>
+            <p>The Playfair cipher was a cipher first invented by Charles Wheatstone in 1854, but it was used by the British during World War I. The cipher involves a key phrase that is then input into a five by five matrix alongside other letters of the alphabet. From this matrix, the encoding is performed. GeeksforGeeks has <a href="https://www.geeksforgeeks.org/playfair-cipher-with-examples/">a good explanation as to how a message is encrypted with the Playfair cipher</a>. There are many variations of Playfair ciphers, and an implementation is provided below.</p>
+            <p>Note about decryption: because a five by five matrix is created, one letter of the alphabet must be sacrificed, and that letter is most often "j", replaced with "i." As a result, when decoding messages, the decoded message will have the letter "i" in place of "j." In addition, because of how Playfair ciphers work, consecutive duplicate letters must be separated by a bogus letter, often "x," and if the message is not of an even length, a "z" will be added to the end. Furthermore, spaces are removed from the original message.</p>
             <div class="block">
                 <h3>Encrypt</h3>
                 <div class="block-input">
@@ -101,7 +101,7 @@
             var encrypted_bytes = aes_cbc.encrypt(message_bytes);
             var encrypted_hex = aesjs.utils.hex.fromBytes(encrypted_bytes);
             document.getElementById('encrypted_aes').textContent = encrypted_hex;
-            console.log(encrypted_hex);
+            // console.log(encrypted_hex);
         }
         function decrypt_message_aes() {
             var encrypted_message = document.getElementById('encrypted_d_aes').value;
@@ -115,8 +115,156 @@
             var decrypted_bytes = aes_cbc.decrypt(encrypted_message_bytes);
             var decrypted_hex = aesjs.utils.utf8.fromBytes(decrypted_bytes);
             document.getElementById('decrypted_aes').textContent = decrypted_hex;
-            console.log(decrypted_hex);
+            // console.log(decrypted_hex);
         }
+
+        // making the key table
+        const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+        function remove_spaces(string) {
+            var output = '';
+            for (let i = 0; i < string.length; i++) {
+                if (string[i] != ' ') {
+                    output += string[i]
+                }
+            }
+            return output;
+        }
+        function j_to_i(string) { // string -> string
+            return string.replaceAll('j', 'i');
+        }
+        function remove_duplicates(string) { // string -> array
+            return Array.from(new Set(string.split('')));
+        }
+        function remove_from_alphabet(strings) { // alphabet array -> array
+            var temp_alphabet = alphabet;
+            var letters = strings;
+            var output = [];
+            for (let i = 0; i < temp_alphabet.length; i++) {
+                let count = 0;
+                for (let j = 0; j < letters.length; j++) {
+                    if (temp_alphabet[i] == letters[j]) {
+                        count++;
+                    }
+                }
+                if (count == 0) {
+                    output.push(temp_alphabet[i]);
+                }
+            }
+            return output;
+        }
+        function make_key_table(key) { // string -> 2d array
+            key = remove_spaces(key);
+            key = j_to_i(key);
+            key = remove_duplicates(key);
+            var new_alphabet = remove_from_alphabet(key);
+            key_table_1 = key.concat(new_alphabet);
+            key_table_2 = [];
+            for (let i = 0; i < key_table_1.length; i += 5) {
+                key_table_2.push(key_table_1.slice(i, i + 5));
+            }
+            return key_table_2
+        }
+
+        // making digrams
+        function bogus_x(string) { // string -> string
+            var output = "";
+            for (let i = 0; i < string.length; i++) {
+                if (i == 0 || string[i] != string[i - 1]) {
+                    output += string[i];
+                } else {
+                    output += 'x' + string[i];
+                }
+            }
+            return output;
+        }
+        function digram_split(string) { // string -> array
+            var output = [];
+            for (let i = 0; i < string.length; i += 2) {
+                output.push(string.slice(i, i + 2));
+            }
+            return output;
+        }
+        function digram(string) { // string -> array
+            string = remove_spaces(string);
+            string = j_to_i(string);
+            string = bogus_x(string);
+            string = digram_split(string);
+            if (string[string.length - 1].length != 2) {
+                string[string.length - 1] += 'z';
+            }
+            return string;
+        }
+        function search_kt(kt, digram) { // 2d array, string -> 2d array
+            var a = digram[0];
+            var b = digram[1];
+            var output = new Array(2); // [row, column], [row, column]
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 5; j++) {
+                    if (kt[i][j] == a) {
+                        output[0] = [i, j];
+                    } else if (kt[i][j] == b) {
+                        output[1] = [i, j];
+                    }
+                }
+            }
+            return output;
+        }
+        // encoding
+        function encode_digram(kt, digram) { // 2d array, string -> string
+            var coords = search_kt(kt, digram);
+            var coords_1 = coords[0];
+            var coords_2 = coords[1];
+            var encoded_1 = '';
+            var encoded_2 = '';
+            if (coords_1[0] == coords_2[0]) {
+                encoded_1 = kt[coords_1[0]][(coords_1[1] + 1) % 5];
+                encoded_2 = kt[coords_2[0]][(coords_2[1] + 1) % 5];
+            } else if (coords_1[1] == coords_2[1]) {
+                encoded_1 = kt[(coords_1[0] + 1) % 5][coords_1[1]];
+                encoded_2 = kt[(coords_2[0] + 1) % 5][coords_2[1]];
+            } else {
+                encoded_1 = kt[coords_1[0]][coords_2[1]];
+                encoded_2 = kt[coords_2[0]][coords_1[1]];
+            }
+            return encoded_1 + encoded_2;
+        }
+        // decoding
+        function decode_digram(kt, digram) { // 2d array, string -> string
+            var coords = search_kt(kt, digram);
+            var coords_1 = coords[0];
+            var coords_2 = coords[1];
+            var decoded_1 = '';
+            var decoded_2 = '';
+            if (coords_1[0] == coords_2[0]) {
+                if (coords_1[1] - 1 < 0) {
+                    decoded_1 = kt[coords_1[0]][coords_1[1] - 1 + 5];
+                } else {
+                    decoded_1 = kt[coords_1[0]][coords_1[1] - 1];
+                }
+                if (coords_2[1] - 1 < 0) {
+                    decoded_1 = kt[coords_2[0]][coords_2[1] - 1 + 5];
+                } else {
+                    decoded_1 = kt[coords_2[0]][coords_2[1] - 1];
+                }
+            } else if (coords_1[1] == coords_2[1]) {
+                if (coords_1[0] - 1 < 0) {
+                    decoded_1 = kt[coords_1[0] - 1 + 5][coords_1[1]];
+                } else {
+                    decoded_1 = kt[coords_1[0] - 1][coords_1[1]];
+                }
+                if (coords_2[0] - 1 < 0) {
+                    decoded_2 = kt[coords_2[0] - 1 + 5][coords_2[1]];
+                } else {
+                    decoded_2 = kt[coords_2[0] - 1][coords_2[1]];
+                }
+            } else {
+                decoded_1 = kt[coords_1[0]][coords_2[1]];
+                decoded_2 = kt[coords_2[0]][coords_1[1]];
+            }
+            return decoded_1 + decoded_2;
+        }
+
+        // onclick functions
         function encrypt_message_pf() {
             var message = document.getElementById('message_pf').value;
             var key = document.getElementById('key1_pf').value;
@@ -124,7 +272,13 @@
                 alert('Please enter both a message and key.');
                 return;
             }
-            console.log('to be implemented');
+            var key_table = make_key_table(key);
+            var digrams = digram(message);
+            var encrypted = '';
+            for (let i = 0; i < digrams.length; i++) {
+                encrypted += encode_digram(key_table, digrams[i]);
+            }
+            document.getElementById('encrypted_pf').textContent = encrypted;
         }
         function decrypt_message_pf() {
             var encrypted_message = document.getElementById('encrypted_d_pf').value;
@@ -133,7 +287,13 @@
                 alert('Please enter both a message and key.');
                 return;
             }
-            console.log('to be implemented');
+            var key_table = make_key_table(key);
+            var digrams = digram(encrypted_message);
+            var decrypted = '';
+            for (let i = 0; i < digrams.length; i++) {
+                decrypted += decode_digram(key_table, digrams[i]);
+            }
+            document.getElementById('decrypted_pf').textContent = decrypted;
         }
     </script>
 </body>
